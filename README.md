@@ -1,5 +1,9 @@
 # Bangazon Platform API
 
+### This is a school project replica of Bangazon API.
+
+### The purpose of this project is to immitate the tasks we would be given as a junior developer. We were given tickets where we need to resolve bugs, tests and reports
+ 
 ## Prerequisites
 
 ### Mac OS
