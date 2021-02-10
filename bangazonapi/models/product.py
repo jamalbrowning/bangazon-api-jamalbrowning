@@ -15,7 +15,7 @@ class Product(SafeDeleteModel):
     customer = models.ForeignKey(
         Customer, on_delete=models.DO_NOTHING, related_name='products')
     price = models.FloatField(
-        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],)
+        validators=[MinValueValidator(0.00), MaxValueValidator(17000.00)],)
     description = models.CharField(max_length=255,)
     quantity = models.IntegerField(validators=[MinValueValidator(0)],)
     created_date = models.DateField(auto_now_add=True)
@@ -61,8 +61,10 @@ class Product(SafeDeleteModel):
         total_rating = 0
         for rating in ratings:
             total_rating += rating.rating
-
-        avg = total_rating / len(ratings)
+        try: 
+          avg = total_rating / len(ratings)
+        except ZeroDivisionError:
+          avg = 0
         return avg
 
     class Meta:
