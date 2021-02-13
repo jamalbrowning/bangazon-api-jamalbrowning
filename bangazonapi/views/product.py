@@ -4,6 +4,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework import status
 from bangazonapi.models import Product, Customer, ProductCategory
@@ -101,6 +102,11 @@ class Products(ViewSet):
             data = ContentFile(base64.b64decode(imgstr), name=f'{new_product.id}-{request.data["name"]}.{ext}')
 
             new_product.image_path = data
+        
+        try:
+            new_product.clean_fields(exclude="image_path")
+        except ValidationError as ex:
+            return Response({"message": ex.args[0]}, status=status.HTTP_400_BAD_REQUEST)
 
         new_product.save()
 
