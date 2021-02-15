@@ -1,4 +1,5 @@
 import json
+import datetime
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -26,6 +27,16 @@ class OrderTests(APITestCase):
         url = "/products"
         data = {"name": "Kite", "price": 14.99, "quantity": 60,
                 "description": "It flies high", "category_id": 1, "location": "Pittsburgh"}
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.post(url, data, format='json')
+        # Create a paymentType
+        url = "/paymenttypes"
+        data = {
+            "merchant_name": "American Express",
+            "account_number": "111-1111-1111",
+            "expiration_date": "2024-12-31",
+            "create_date": datetime.date.today()
+        }
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -88,7 +99,7 @@ class OrderTests(APITestCase):
 
         # add payment_type to order
         url = "/orders/1"
-        data = {"payment_type: 1"}
+        data = {"payment_type": 1}
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
         response = self.client.put(url, data, format="json")
 
@@ -97,7 +108,7 @@ class OrderTests(APITestCase):
         # Getorder and verify payment_type was added
         url = "/orders/1"
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
-        response = self.client.put(url, data, format="json")
+        response = self.client.get(url, None, format="json")
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -105,29 +116,29 @@ class OrderTests(APITestCase):
         self.assertEqual(json_response["payment_type"].split('/')[-1], '1')
         # TODO: New line item is not added to closed order
 
-    # def test_new_line_item_not_added_to_closed_order(self):
-    #     """
-    #     Ensure that we do not add a new line item to a closed order
-    #     """
+    def test_new_line_item_not_added_to_closed_order(self):
+        """
+        Ensure that we do not add a new line item to a closed order
+        """
 
-    #     # Close out the first order by adding a payment_type to that order
-    #     self.test_add_payment_type_to_order()
+        # Close out the first order by adding a payment_type to that order
+        self.test_add_payment_type_to_order()
 
-    #     # Add product to a new order
-    #     url = "/cart"
-    #     data = {"product_id": 1}
-    #     self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-    #     response = self.client.post(url, data, format='json')
+        # Add product to a new order
+        url = "/cart"
+        data = {"product_id": 1}
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.post(url, data, format='json')
 
-    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    #     # Get cart and verify product was added
-    #     url = "/cart"
-    #     self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-    #     response = self.client.get(url, None, format='json')
-    #     json_response = json.loads(response.content)
+        # Get cart and verify product was added
+        url = "/cart"
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.get(url, None, format='json')
+        json_response = json.loads(response.content)
 
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(json_response["id"], 2)
-    #     self.assertEqual(json_response["size"], 1)
-    #     self.assertEqual(len(json_response["lineitems"]), 1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json_response["id"], 2)
+        self.assertEqual(json_response["size"], 1)
+        self.assertEqual(len(json_response["lineitems"]), 1)
