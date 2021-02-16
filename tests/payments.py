@@ -1,5 +1,6 @@
 import datetime
 import json
+from django.http.response import JsonResponse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -16,7 +17,6 @@ class PaymentTests(APITestCase):
         json_response = json.loads(response.content)
         self.token = json_response["token"]
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
 
     def test_create_payment_type(self):
         """
@@ -38,6 +38,29 @@ class PaymentTests(APITestCase):
         self.assertEqual(json_response["merchant_name"], "American Express")
         self.assertEqual(json_response["account_number"], "111-1111-1111")
         self.assertEqual(json_response["expiration_date"], "2024-12-31")
-        self.assertEqual(json_response["create_date"], str(datetime.date.today()))
+        self.assertEqual(
+            json_response["create_date"], str(datetime.date.today()))
 
     # TODO: Delete payment type
+
+    def test_delete_payment_type(self):
+        """
+        Ensure we can remove a product from an order.
+        """
+        # add payment type
+        self.test_create_payment_type()
+
+        # remove payment
+        url = "/paymenttypes/1"
+        data = {"id": 1}
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.delete(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        url = "/paymenttypes"
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.get(url, None, format='json')
+        json_response = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
