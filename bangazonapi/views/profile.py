@@ -91,7 +91,7 @@ class Profile(ViewSet):
             """
             try:
                 open_order = Order.objects.get(
-                    customer=current_user, payment_type=None)
+                    customer=current_user, payment_type_isnull=True)
                 line_items = OrderProduct.objects.filter(order=open_order)
                 line_items.delete()
                 open_order.delete()
