@@ -112,10 +112,10 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # get products and verify product was removed
-        url = "/products"
+        url = "/products/1"
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.get(url, None, format='json')
-        json_response = json.loads(response.content)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR)
     # TODO: Product can be rated. Assert average rating exists.
