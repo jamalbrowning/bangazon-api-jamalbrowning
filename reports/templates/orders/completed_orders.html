@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reports</title>
+    <style>
+      td {
+        text-align: center;
+        padding: 5px;
+      }
+
+      th {
+        padding: 5px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>All completed orders</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Payment Type</th>
+          <th>Total Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in completed_orders %}
+        <tr>
+          <td>{{ order.order_id }}</td>
+          <td>{{ order.full_name }}</td>
+          <td>{{ order.payment_type }}</td>
+          <td>{{ order.total_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
