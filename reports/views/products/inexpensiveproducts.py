@@ -17,7 +17,7 @@ def inexpensiveproduct_list(request):
               SELECT 
                 *
               FROM bangazonapi_product
-              WHERE bangazonapi_product.price <= 999 
+              WHERE bangazonapi_product.price <= 999.99 
               ORDER BY bangazonapi_product.price ASC
         """)
 
